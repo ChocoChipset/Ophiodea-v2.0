@@ -6,3 +6,7 @@
 // Area to merge:
 #define kMERGING_WIDTH 120
 #define kMERGING_HEIGHT 100
+
+
+
+#define kTHREE_CHANNELS 3

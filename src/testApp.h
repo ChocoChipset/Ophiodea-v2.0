@@ -6,6 +6,7 @@
 
 class testApp : public ofBaseApp{
 	public:
+
 		void setup();
 		void update();
 		void draw();
@@ -19,4 +20,15 @@ class testApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
+
+        void updateALLtheCaptures();
+
+        // Our own variables
+
+        ofVideoGrabber videoGrabber[kNUMBER_OF_CAMERAS];
+        ofPixels pixelsFromCamera[kNUMBER_OF_CAMERAS];
+		// Our own functions
+
+
+
 };
