@@ -1,7 +1,16 @@
 #include "testApp.h"
 
+// Our own functions
 //--------------------------------------------------------------
-void testApp::setup(){
+
+
+
+//--------------------------------------------------------------
+
+// OF Methods:
+//--------------------------------------------------------------
+void testApp::setup()
+{
 
 }
 
@@ -56,6 +65,6 @@ void testApp::gotMessage(ofMessage msg){
 }
 
 //--------------------------------------------------------------
-void testApp::dragEvent(ofDragInfo dragInfo){ 
+void testApp::dragEvent(ofDragInfo dragInfo){
 
 }
