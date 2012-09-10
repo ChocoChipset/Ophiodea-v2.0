@@ -21,14 +21,26 @@ class testApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 
-        void updateALLtheCaptures();
+
 
         // Our own variables
 
         ofVideoGrabber videoGrabber[kNUMBER_OF_CAMERAS];
         ofPixels pixelsFromCamera[kNUMBER_OF_CAMERAS];
+        ofPixels pixelsForOutput;
+        ofPixels pixelsForTopImage;
+        ofPixels pixelsForBottomImage;
+
+
+        int halfTheNumberOfCameras;
+
+        int outputImageWidth;
+        int outputImageHeight;
+
 		// Our own functions
 
-
-
+        void updateALLtheCaptures();
+        void placeCapturedImagesOnScreen();
+        void drawVerticalAlphaComposites();
+        void drawHorizontalAlphaComposites();
 };
