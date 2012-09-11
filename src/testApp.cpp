@@ -157,7 +157,8 @@ void testApp::applySphereTransformation()
     ofPixels tempPixels;
     tempPixels.allocate(outputImageWidth, outputImageHeight, OF_IMAGE_COLOR);
     tempPixels.setFromPixels(pixelsForOutput.getPixels(), outputImageWidth, outputImageHeight, kTHREE_CHANNELS);
-
+    pixelsForOutput.clear();
+    pixelsForOutput.allocate(outputImageWidth, outputImageHeight, OF_IMAGE_COLOR);
 
     float x, y;
     float xt, yt;
@@ -176,17 +177,20 @@ void testApp::applySphereTransformation()
             it = int(halfOutputImageWidth * xt + halfOutputImageWidth);
             jt = int(halfOutputImageHeight * yt + halfOutputImageHeight);
 
-            position= 3 * (j*outputImageWidth) + i; //anImage.get(i, j);
+            position= 3 * ((j*outputImageWidth) + i); //anImage.get(i, j);
 
             rSource = tempPixels[position];
             gSource = tempPixels[position + 1];
             bSource = tempPixels[position + 2];
 
-            positionTarget = (jt*outputImageWidth) + it;
+            positionTarget = 3 * ((jt*outputImageWidth) + it);
 
             pixelsForOutput[positionTarget] = rSource;
             pixelsForOutput[positionTarget + 1 ] = gSource;
             pixelsForOutput[positionTarget + 2 ] = bSource;
+
+
+
 
     }
   }
@@ -243,7 +247,7 @@ void testApp::setup()
     outputImageWidth = (kCAPTURED_IMAGE_WIDTH * halfTheNumberOfCameras) - (kMERGING_AREA_WIDTH * (kNUMBER_OF_CAMERAS-1));
 
     // Composite is composed by "two floors": Twice the height minus - merging area
-    outputImageHeight= (kCAPTURED_IMAGE_HEIGHT * 2) -kMERGING_AREA_HEIGHT;
+    outputImageHeight= (kCAPTURED_IMAGE_HEIGHT * 2) - kMERGING_AREA_HEIGHT;
 
     imageWidthWithoutBlendingArea = kCAPTURED_IMAGE_WIDTH - kMERGING_AREA_WIDTH;
     imageHeightWithoutBlendingArea = kCAPTURED_IMAGE_HEIGHT- kMERGING_AREA_HEIGHT;
@@ -278,7 +282,7 @@ void testApp::draw()
 {
     ofImage outputImage;
 	outputImage.setFromPixels(pixelsForOutput);
-    //ofSetRectMode(OF_RECTMODE_CENTER);
+    ofSetRectMode(OF_RECTMODE_CENTER);
     outputImage.draw(0, 0,ofGetHeight(),ofGetHeight());
 
     ofDrawBitmapString( ofToString(ofGetFrameRate()), 10,10);
