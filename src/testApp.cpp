@@ -3,7 +3,36 @@
 
 // Our own functions
 //--------------------------------------------------------------
+/*
+void testApp::makeLookUpTable()
+{
+	float x,y;
+	float xt,yt;
+	int it,jt;
 
+	int h = imgout.getHeight();
+	int w = imgout.getWidth();
+
+	for (int j=0;j<h;j++) {
+		for (int i=0;i<w;i++) {
+
+			x = (i-ic)/rw;
+			y = (j-jc)/rh;
+
+			xt = x*sqrt(1-0.5*y*y);
+			yt = y*sqrt(1-0.5*x*x);
+
+			it = int(rw*xt + ic);
+			jt = int(rh*yt + jc);
+
+			//c = imgout.pixels[i+j*imgout.width];//get(i,j);
+			//imgcircle.pixels[it+jt*imgcircle.width] = c;//set(it,jt,c);
+			lookUpCircleX[i][j] = it;
+			lookUpCircleY[i][j] = jt;
+		}
+
+	}
+*/
 void testApp::drawHorizontalAlphaComposites()
 {
     ofColor ca,cb,ct;
@@ -121,7 +150,46 @@ void testApp::drawVerticalAlphaComposites()
 
 void testApp::applySphereTransformation()
 {
+    float rSource,gSource,bSource;
+    float rTarget,gTarget,bTarget;
+    int position, positionTarget;
 
+    ofPixels tempPixels;
+    tempPixels.allocate(outputImageWidth, outputImageHeight, OF_IMAGE_COLOR);
+    tempPixels.setFromPixels(pixelsForOutput.getPixels(), outputImageWidth, outputImageHeight, kTHREE_CHANNELS);
+
+
+    float x, y;
+    float xt, yt;
+    int it, jt;
+
+    for (int j = 0; j < outputImageHeight; ++j) {
+
+        for (int i = 0; i < outputImageWidth; ++i) {
+
+            x = (i - halfOutputImageWidth) / halfOutputImageWidth;
+            y = (j - halfOutputImageHeight) / halfOutputImageHeight;
+
+            xt = x * sqrt(1 - 0.5 * y * y);
+            yt = y * sqrt(1 - 0.5 * x * x);
+
+            it = int(halfOutputImageWidth * xt + halfOutputImageWidth);
+            jt = int(halfOutputImageHeight * yt + halfOutputImageHeight);
+
+            position= 3 * (j*outputImageWidth) + i; //anImage.get(i, j);
+
+            rSource = tempPixels[position];
+            gSource = tempPixels[position + 1];
+            bSource = tempPixels[position + 2];
+
+            positionTarget = (jt*outputImageWidth) + it;
+
+            pixelsForOutput[positionTarget] = rSource;
+            pixelsForOutput[positionTarget + 1 ] = gSource;
+            pixelsForOutput[positionTarget + 2 ] = bSource;
+
+    }
+  }
 }
 
 
@@ -185,6 +253,9 @@ void testApp::setup()
     pixelsForBottomImage.allocate(outputImageWidth, outputImageHeight, OF_IMAGE_COLOR);
     pixelsForTopImage.allocate(outputImageWidth, outputImageHeight, OF_IMAGE_COLOR);
 
+    halfOutputImageHeight = outputImageHeight / 2;
+    halfOutputImageWidth = outputImageWidth / 2;
+
     ofBackground(0, 0, 0);  // Black Background
 
 
@@ -195,19 +266,16 @@ void testApp::update()
 {
     updateALLtheCaptures();
 
-
+    placeCapturedImagesOnScreen();
+    drawVerticalAlphaComposites();
+    drawHorizontalAlphaComposites();
+    applySphereTransformation();
 
 }
 
 //--------------------------------------------------------------
 void testApp::draw()
 {
-    placeCapturedImagesOnScreen();
-    drawVerticalAlphaComposites();
-    drawHorizontalAlphaComposites();
-
-
-
     ofImage outputImage;
 	outputImage.setFromPixels(pixelsForOutput);
     //ofSetRectMode(OF_RECTMODE_CENTER);

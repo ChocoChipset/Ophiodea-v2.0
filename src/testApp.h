@@ -36,8 +36,14 @@ class testApp : public ofBaseApp{
 
         int outputImageWidth;
         int outputImageHeight;
+
+        double halfOutputImageWidth;
+        double halfOutputImageHeight;
+
         int imageWidthWithoutBlendingArea;
         int imageHeightWithoutBlendingArea;
+
+
 		// Our own functions
 
         void updateALLtheCaptures();
@@ -45,4 +51,5 @@ class testApp : public ofBaseApp{
         void drawVerticalAlphaComposites();
         void drawHorizontalAlphaComposites();
         void applySphereTransformation();
+        void makeLookUpTable();
 };
