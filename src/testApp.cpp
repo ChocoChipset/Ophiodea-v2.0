@@ -282,7 +282,7 @@ void testApp::draw()
 {
     ofImage outputImage;
 	outputImage.setFromPixels(pixelsForOutput);
-    ofSetRectMode(OF_RECTMODE_CENTER);
+    //ofSetRectMode(OF_RECTMODE_CENTER);
     outputImage.draw(0, 0,ofGetHeight(),ofGetHeight());
 
     ofDrawBitmapString( ofToString(ofGetFrameRate()), 10,10);
