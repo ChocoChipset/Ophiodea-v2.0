@@ -8,11 +8,9 @@ void testApp::drawHorizontalAlphaComposites()
 {
     ofColor ca,cb,ct;
 	float ra,ga,ba,rb,gb,bb,rt,gt,bt;
+    float alphaChannel, alphaChannelCompliment;
 
     int startPositionY = (kCAPTURED_IMAGE_HEIGHT - kMERGING_AREA_HEIGHT);
-
-    float alphaChannel, alphaChannelCompliment;
-    int currentImageIndex;
 
     for (int i=0; i< kMERGING_AREA_HEIGHT; ++i)
     {
@@ -42,24 +40,93 @@ void testApp::drawHorizontalAlphaComposites()
 			pixelsForOutput[pf+1] = gt;
 
 			pixelsForOutput[pf+2] = bt;
-
-
-
-
-
-
         }
 
     }
 
+}
+
+void testApp::drawVerticalAlphaComposites()
+{
+    ofColor ca,cb,ct;
+	float ra,ga,ba,rb,gb,bb,rt,gt,bt;
+    float alphaChannel, alphaChannelCompliment;
+
+    for (int k = 1; k < halfTheNumberOfCameras; ++k)
+    {
+        for (int i = 0; i < kMERGING_AREA_WIDTH; ++i)
+        {
+            int startPositionX = (kCAPTURED_IMAGE_WIDTH - kMERGING_AREA_WIDTH) * k;
+
+            alphaChannel =  i / float(kMERGING_AREA_WIDTH-1);
+            alphaChannelCompliment = 1 - alphaChannel;
+
+            for (int j=0; j < kCAPTURED_IMAGE_HEIGHT; ++j)
+            {
+                // For Top Image
+				int p = ((kCAPTURED_IMAGE_WIDTH-kMERGING_AREA_WIDTH+i)+(j*kCAPTURED_IMAGE_WIDTH)) * 3;
+				ra = pixelsFromCamera[k-1][p];
+				ga = pixelsFromCamera[k-1][p+1];
+				ba = pixelsFromCamera[k-1][p+2];
+
+				int pb = (i + (j * kCAPTURED_IMAGE_WIDTH)) * 3;
+				rb = pixelsFromCamera[k][pb];
+				gb = pixelsFromCamera[k][pb+1];
+				bb = pixelsFromCamera[k][pb+2];
+
+				rt = alphaChannelCompliment * ra + alphaChannel * rb;
+				gt = alphaChannelCompliment * ga + alphaChannel * gb;
+				bt = alphaChannelCompliment * ba + alphaChannel * bb;
+
+				int pf = 3 * ( (startPositionX+i)+(outputImageWidth*j) );
+				pixelsForTopImage[pf] = rt;
+				pixelsForTopImage[pf+1] = gt;
+				pixelsForTopImage[pf+2] = bt;
+
+                // For Bottom Image
+				p = ((kCAPTURED_IMAGE_WIDTH-kMERGING_AREA_WIDTH+i)+(j*kCAPTURED_IMAGE_WIDTH)) * 3;
+				ra = pixelsFromCamera[k-1 + halfTheNumberOfCameras][p];
+				ga = pixelsFromCamera[k-1 + halfTheNumberOfCameras][p+1];
+				ba = pixelsFromCamera[k-1 + halfTheNumberOfCameras][p+2];
+
+				pb = (i + (j * kCAPTURED_IMAGE_WIDTH)) * 3;
+				rb = pixelsFromCamera[k + halfTheNumberOfCameras][pb];
+				gb = pixelsFromCamera[k + halfTheNumberOfCameras][pb+1];
+				bb = pixelsFromCamera[k + halfTheNumberOfCameras][pb+2];
+
+				rt = alphaChannelCompliment * ra + alphaChannel * rb;
+				gt = alphaChannelCompliment * ga + alphaChannel * gb;
+				bt = alphaChannelCompliment * ba + alphaChannel * bb;
+
+				pf = 3 * ( (startPositionX+i)+(outputImageWidth*j) );
+				pixelsForBottomImage[pf] = rt;
+				pixelsForBottomImage[pf+1] = gt;
+				pixelsForBottomImage[pf+2] = bt;
+
+
+
+            }
+
+        }
+
+
+
+    }
+
+    pixelsForTopImage.pasteInto(pixelsForOutput, 0, 0);
+    pixelsForBottomImage.pasteInto(pixelsForOutput, 0, imageHeightWithoutBlendingArea);
 
 }
 
+
+void testApp::applySphereTransformation()
+{
+
+}
+
+
 void testApp::placeCapturedImagesOnScreen()
 {
-    int imageWidthWithoutBlendingArea = kCAPTURED_IMAGE_WIDTH - kMERGING_AREA_WIDTH;
-    int imageHeightWithoutBlendingArea = kCAPTURED_IMAGE_HEIGHT- kMERGING_AREA_HEIGHT;
-
     for (int j = 0; j < halfTheNumberOfCameras; ++j)
     {
         pixelsFromCamera[j].pasteInto(pixelsForTopImage, j * imageWidthWithoutBlendingArea, 0);
@@ -68,6 +135,7 @@ void testApp::placeCapturedImagesOnScreen()
 
     pixelsForTopImage.pasteInto(pixelsForOutput, 0, 0);
     pixelsForBottomImage.pasteInto(pixelsForOutput, 0, imageHeightWithoutBlendingArea);
+
 }
 
 void testApp::updateALLtheCaptures()  // "X all the Y" pun intended
@@ -109,6 +177,9 @@ void testApp::setup()
     // Composite is composed by "two floors": Twice the height minus - merging area
     outputImageHeight= (kCAPTURED_IMAGE_HEIGHT * 2) -kMERGING_AREA_HEIGHT;
 
+    imageWidthWithoutBlendingArea = kCAPTURED_IMAGE_WIDTH - kMERGING_AREA_WIDTH;
+    imageHeightWithoutBlendingArea = kCAPTURED_IMAGE_HEIGHT- kMERGING_AREA_HEIGHT;
+
     pixelsForOutput.allocate(outputImageWidth, outputImageHeight, OF_IMAGE_COLOR);
 
     pixelsForBottomImage.allocate(outputImageWidth, outputImageHeight, OF_IMAGE_COLOR);
@@ -132,7 +203,10 @@ void testApp::update()
 void testApp::draw()
 {
     placeCapturedImagesOnScreen();
-    //drawHorizontalAlphaComposites();
+    drawVerticalAlphaComposites();
+    drawHorizontalAlphaComposites();
+
+
 
     ofImage outputImage;
 	outputImage.setFromPixels(pixelsForOutput);

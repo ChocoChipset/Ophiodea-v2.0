@@ -4,8 +4,8 @@
 #define kCAPTURED_IMAGE_HEIGHT 240
 
 // Area to merge:
-#define kMERGING_AREA_WIDTH 20
-#define kMERGING_AREA_HEIGHT 25
+#define kMERGING_AREA_WIDTH 25
+#define kMERGING_AREA_HEIGHT 35
 
 
 

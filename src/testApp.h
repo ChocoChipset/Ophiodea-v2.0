@@ -36,11 +36,13 @@ class testApp : public ofBaseApp{
 
         int outputImageWidth;
         int outputImageHeight;
-
+        int imageWidthWithoutBlendingArea;
+        int imageHeightWithoutBlendingArea;
 		// Our own functions
 
         void updateALLtheCaptures();
         void placeCapturedImagesOnScreen();
         void drawVerticalAlphaComposites();
         void drawHorizontalAlphaComposites();
+        void applySphereTransformation();
 };
