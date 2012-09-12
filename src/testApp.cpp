@@ -248,11 +248,25 @@ void testApp::placeCapturedImagesOnScreen()
 
 void testApp::updateALLtheCaptures()  // "X all the Y" pun intended
 {
-    for( int i = 0; i < kNUMBER_OF_CAMERAS; ++i)
+#ifdef DEMO_MODE
+	videoGrabber[0].grabFrame();
+	for( int i = 0; i < kNUMBER_OF_CAMERAS; ++i){
+		ofPixels mirrorPix = videoGrabber[0].getPixelsRef();
+		mirrorPix.mirror(1,0);
+		
+		if(i%2==0)
+			pixelsFromCamera[i].setFromPixels(mirrorPix.getPixels(), kCAPTURED_IMAGE_WIDTH, kCAPTURED_IMAGE_HEIGHT, kTHREE_CHANNELS); // Place capture in ofPixels object
+		else
+			pixelsFromCamera[i].setFromPixels(videoGrabber[0].getPixels(), kCAPTURED_IMAGE_WIDTH, kCAPTURED_IMAGE_HEIGHT, kTHREE_CHANNELS); // Place capture in ofPixels object
+	}
+#else
+	for( int i = 0; i < kNUMBER_OF_CAMERAS; ++i)
     {
         videoGrabber[i].grabFrame();
         pixelsFromCamera[i].setFromPixels(videoGrabber[i].getPixels(), kCAPTURED_IMAGE_WIDTH, kCAPTURED_IMAGE_HEIGHT, kTHREE_CHANNELS); // Place capture in ofPixels object
     }
+#endif
+	
 }
 //--------------------------------------------------------------
 
@@ -272,12 +286,16 @@ void testApp::setup()
         pixelsFromCamera[i].allocate(kCAPTURED_IMAGE_WIDTH, kCAPTURED_IMAGE_HEIGHT, OF_IMAGE_COLOR);
     }
 
-    // Initialize Video Grabbers
+#ifdef DEMO_MODE
+	videoGrabber[0].initGrabber(kCAPTURED_IMAGE_WIDTH, kCAPTURED_IMAGE_HEIGHT);
+#else
+	// Initialize Video Grabbers
     for(int i = 0; i < kNUMBER_OF_CAMERAS; ++i)
     {
         videoGrabber[i].setDeviceID(i);
         videoGrabber[i].initGrabber(kCAPTURED_IMAGE_WIDTH, kCAPTURED_IMAGE_HEIGHT);
     }
+#endif
 
     // Calculate Composite Image Output
 

@@ -3,6 +3,7 @@
 #include "ofMain.h"
 #include "OphiodeaConstants.h"
 
+//#define DEMO_MODE
 
 class testApp : public ofBaseApp{
 	public:
