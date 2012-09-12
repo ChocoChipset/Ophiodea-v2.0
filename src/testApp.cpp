@@ -1,5 +1,6 @@
 #include "testApp.h"
 #include <assert.h>
+#include <math.h>
 
 // Our own functions
 //--------------------------------------------------------------
@@ -33,6 +34,21 @@ void testApp::makeLookUpTable()
 
 	}
 */
+void testApp::calculateAmountOfMovement()
+{
+    int position;
+
+    for (int j = 0; j < outputImageHeight; ++j) {
+
+        for (int i = 0; i < outputImageWidth; ++i) {
+
+                position = 3 * ((j*outputImageWidth) + i);
+                pixelsForOutput[position] = pixelsForOutput[position] + (amountOfMovement *.01);
+        }
+    }
+
+}
+
 void testApp::drawHorizontalAlphaComposites()
 {
     ofColor ca,cb,ct;
@@ -150,9 +166,13 @@ void testApp::drawVerticalAlphaComposites()
 
 void testApp::applySphereTransformation()
 {
+    amountOfMovement = 0;
     float rSource,gSource,bSource;
-    float rTarget,gTarget,bTarget;
+
+    float rPrevious, gPrevious, bPrevious;
     int position, positionTarget;
+
+    float differenceInPixel;
 
     ofPixels tempPixels;
     tempPixels.allocate(outputImageWidth, outputImageHeight, OF_IMAGE_COLOR);
@@ -177,11 +197,25 @@ void testApp::applySphereTransformation()
             it = int(halfOutputImageWidth * xt + halfOutputImageWidth);
             jt = int(halfOutputImageHeight * yt + halfOutputImageHeight);
 
-            position= 3 * ((j*outputImageWidth) + i); //anImage.get(i, j);
+            position = 3 * ((j*outputImageWidth) + i); //anImage.get(i, j);
 
             rSource = tempPixels[position];
             gSource = tempPixels[position + 1];
             bSource = tempPixels[position + 2];
+
+            // Calculate amount of movement here:
+
+            rPrevious = previosPixelsForOutput[position];
+            gPrevious = previosPixelsForOutput[position + 1];
+            bPrevious = previosPixelsForOutput[position + 2];
+
+            differenceInPixel = distanceBetweenTwoPoints(rSource, gSource, bSource, rPrevious, gPrevious, bPrevious);
+
+            if (differenceInPixel > kMOVEMENT_LOW_PASS_FILTER_CONSTANT)
+            {
+                amountOfMovement += differenceInPixel;
+
+            }
 
             positionTarget = 3 * ((jt*outputImageWidth) + it);
 
@@ -192,8 +226,10 @@ void testApp::applySphereTransformation()
 
 
 
+        }
     }
-  }
+
+    previosPixelsForOutput.setFromPixels(pixelsForOutput.getPixels(), outputImageWidth, outputImageHeight, kTHREE_CHANNELS);
 }
 
 
@@ -226,6 +262,8 @@ void testApp::setup()
 {
     assert(kNUMBER_OF_CAMERAS % 2 == 0);    // We really need cameras in even numbers. Exit if not.
 
+    amountOfMovement = 0;
+
     halfTheNumberOfCameras = kNUMBER_OF_CAMERAS / 2;
 
     // Allocate Object to hold captured images
@@ -257,6 +295,8 @@ void testApp::setup()
     pixelsForBottomImage.allocate(outputImageWidth, outputImageHeight, OF_IMAGE_COLOR);
     pixelsForTopImage.allocate(outputImageWidth, outputImageHeight, OF_IMAGE_COLOR);
 
+    previosPixelsForOutput.allocate(outputImageWidth, outputImageHeight, OF_IMAGE_COLOR);
+
     halfOutputImageHeight = outputImageHeight / 2;
     halfOutputImageWidth = outputImageWidth / 2;
 
@@ -274,6 +314,7 @@ void testApp::update()
     drawVerticalAlphaComposites();
     drawHorizontalAlphaComposites();
     applySphereTransformation();
+    calculateAmountOfMovement();
 
 }
 
@@ -283,9 +324,15 @@ void testApp::draw()
     ofImage outputImage;
 	outputImage.setFromPixels(pixelsForOutput);
     //ofSetRectMode(OF_RECTMODE_CENTER);
-    outputImage.draw(0, 0,ofGetHeight(),ofGetHeight());
+    outputImage.draw(0, 0, ofGetHeight(),ofGetHeight());
 
     ofDrawBitmapString( ofToString(ofGetFrameRate()), 10,10);
+    ofDrawBitmapString( ofToString(amountOfMovement), 10,30);
+}
+
+double testApp::distanceBetweenTwoPoints(float x1, float y1, float z1, float x2, float y2, float z2)
+{
+	return sqrt(pow((x2 - x1), 2) + pow((y2 - y1), 2) + pow((z2 - z1), 2));
 }
 
 // Interruption events
@@ -294,7 +341,7 @@ void testApp::keyPressed(int key){
 
 }
 
-//--------------------------------------------------------------
+//---------------------------------------------f-----------------
 void testApp::keyReleased(int key){
 
 }

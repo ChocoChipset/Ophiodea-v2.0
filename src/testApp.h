@@ -30,6 +30,7 @@ class testApp : public ofBaseApp{
         ofPixels pixelsForOutput;
         ofPixels pixelsForTopImage;
         ofPixels pixelsForBottomImage;
+        ofPixels previosPixelsForOutput;
 
 
         int halfTheNumberOfCameras;
@@ -39,6 +40,8 @@ class testApp : public ofBaseApp{
 
         double halfOutputImageWidth;
         double halfOutputImageHeight;
+
+        double amountOfMovement;
 
         int imageWidthWithoutBlendingArea;
         int imageHeightWithoutBlendingArea;
@@ -51,5 +54,6 @@ class testApp : public ofBaseApp{
         void drawVerticalAlphaComposites();
         void drawHorizontalAlphaComposites();
         void applySphereTransformation();
-        void makeLookUpTable();
+        void calculateAmountOfMovement();
+        double distanceBetweenTwoPoints(float x1, float y1, float z1, float x2, float y2, float z2);
 };
