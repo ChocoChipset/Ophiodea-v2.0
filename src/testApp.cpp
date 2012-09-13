@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <math.h>
 
+
 // Our own functions
 //--------------------------------------------------------------
 /*
@@ -34,6 +35,48 @@ void testApp::makeLookUpTable()
 
 	}
 */
+
+void testApp::calculateMovmementForShader()
+{
+	int position;
+	float rSource,gSource,bSource;
+    float rPrevious, gPrevious, bPrevious;
+	float differenceInPixel;
+	float grayPix;
+	float grayPPix;
+	amountOfMovement = 0;
+	
+	
+		
+        for (int i = 0; i < outputImageWidth*outputImageHeight*3; i+=6) {
+			
+			position = i;//3 * ((j*outputImageWidth) + i); //anImage.get(i, j);
+			
+            rSource = pixelsForOutput[position];
+            gSource = pixelsForOutput[position + 1];
+            bSource = pixelsForOutput[position + 2];
+			
+            rPrevious = previosPixelsForOutput[position];
+            gPrevious = previosPixelsForOutput[position + 1];
+            bPrevious = previosPixelsForOutput[position + 2];
+			
+			grayPix = .333*rSource + .333*gSource + .333*bSource;
+			grayPPix = .333*rPrevious + .333*gPrevious + .333*bPrevious;
+			differenceInPixel = abs(grayPix - grayPPix);
+			if (differenceInPixel > kMOVEMENT_LOW_PASS_FILTER_CONSTANT*.5) amountOfMovement += differenceInPixel;
+			
+		}
+	
+	
+	previosPixelsForOutput.setFromPixels(pixelsForOutput.getPixels(), outputImageWidth, outputImageHeight, kTHREE_CHANNELS);
+	
+	 for (int i = 0; i < outputImageWidth*outputImageHeight*3; i+=3)
+	 {
+		 
+	 }
+	 
+}
+
 void testApp::calculateAmountOfMovement()
 {
     
@@ -314,6 +357,15 @@ void testApp::renderWithShader(){
 }
 
 
+void testApp::startNextCamera(){
+	
+	if(camsStarted < kNUMBER_OF_CAMERAS)
+	{
+		videoGrabber[camsStarted].setDeviceID(camsStarted);
+		videoGrabber[camsStarted].initGrabber(kCAPTURED_IMAGE_WIDTH, kCAPTURED_IMAGE_HEIGHT);
+	}
+	
+}
 
 //--------------------------------------------------------------
 
@@ -322,7 +374,8 @@ void testApp::renderWithShader(){
 void testApp::setup()
 {
     assert(kNUMBER_OF_CAMERAS % 2 == 0);    // We really need cameras in even numbers. Exit if not.
-
+	
+	camsStarted = 0;
     amountOfMovement = 0;
 
     halfTheNumberOfCameras = kNUMBER_OF_CAMERAS / 2;
@@ -337,11 +390,11 @@ void testApp::setup()
 	videoGrabber[0].initGrabber(kCAPTURED_IMAGE_WIDTH, kCAPTURED_IMAGE_HEIGHT);
 #else
 	// Initialize Video Grabbers
-    for(int i = 0; i < kNUMBER_OF_CAMERAS; ++i)
-    {
-        videoGrabber[i].setDeviceID(i);
-        videoGrabber[i].initGrabber(kCAPTURED_IMAGE_WIDTH, kCAPTURED_IMAGE_HEIGHT);
-    }
+    //for(int i = 0; i < kNUMBER_OF_CAMERAS; ++i)
+    //{
+    //    videoGrabber[i].setDeviceID(i);
+    //    videoGrabber[i].initGrabber(kCAPTURED_IMAGE_WIDTH, kCAPTURED_IMAGE_HEIGHT);
+    //}
 #endif
 
     // Calculate Composite Image Output
@@ -380,17 +433,33 @@ void testApp::setup()
 //--------------------------------------------------------------
 void testApp::update()
 {
-    updateALLtheCaptures();
+    if(camsStarted == kNUMBER_OF_CAMERAS)
+	{
+	
+		updateALLtheCaptures();
 
-    placeCapturedImagesOnScreen();
-    drawVerticalAlphaComposites();
-    drawHorizontalAlphaComposites();
+		placeCapturedImagesOnScreen();
+		drawVerticalAlphaComposites();
+		drawHorizontalAlphaComposites();
+		
+		if(!bUseShaderRender){
+			applySphereTransformation();
+			calculateAmountOfMovement();
+		}else{
+			//calculateMovmementForShader();
+		}
     
-	if(!bUseShaderRender){
-		applySphereTransformation();
-		calculateAmountOfMovement();
+	}else{
+		for(int i = 0; i < camsStarted; i++)
+		{
+			if(i > halfTheNumberOfCameras)
+			{
+				videoGrabber[i].draw(i*videoGrabber[i].getWidth(),videoGrabber[i].getHeight());
+			}else{
+				videoGrabber[i].draw(i*videoGrabber[i].getWidth(),0);
+			}
+		}
 	}
-    
 }
 
 //--------------------------------------------------------------
@@ -420,7 +489,6 @@ void testApp::draw()
 	
 	}else{
 		renderWithShader();
-		//renderToSphere();
 	}
 	
 }
@@ -435,7 +503,8 @@ double testApp::distanceBetweenTwoPoints(float x1, float y1, float z1, float x2,
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
 	if(key == 's') bUseShaderRender = !bUseShaderRender;
-	if(key == 'm') bUseMask = !bUseMask;
+	else if(key == 'm') bUseMask = !bUseMask;
+	else if(key == ' ') startNextCamera();
 }
 
 //---------------------------------------------f-----------------
