@@ -1,5 +1,6 @@
 obj/*
 bin/*
+!bin/data
 # Compiled Object files
 *.slo
 *.lo
