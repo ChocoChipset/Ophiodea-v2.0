@@ -12,7 +12,7 @@ class testApp : public ofBaseApp{
 		void update();
 		void draw();
         void exit();
-
+		
 		void keyPressed(int key);
 		void keyReleased(int key);
 		void mouseMoved(int x, int y);
@@ -54,7 +54,8 @@ class testApp : public ofBaseApp{
 
 		bool bUseMask;
 		ofImage maskImg;
-
+		int camsStarted;
+		
 		// Our own functions
 
         void updateALLtheCaptures();
@@ -67,4 +68,8 @@ class testApp : public ofBaseApp{
 
 		// shader render
 		void renderWithShader();
+		void calculateMovmementForShader();
+		
+		void startNextCamera();
+		
 };

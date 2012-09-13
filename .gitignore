@@ -1,3 +1,5 @@
+.DS_Store
+build/
 obj/*
 bin/*
 !bin/data
