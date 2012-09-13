@@ -337,9 +337,9 @@ void testApp::scheduleMotorStop()
 
     time(&now);
 
-    if (difftime(now, timeSinceLasqtActivation) > kMOTOR_ACTIVATION_INTERVAL && isMotorRunning)
+    if (difftime(now, timeSinceLastActivation) > kMOTOR_ACTIVATION_INTERVAL && isMotorRunning)
     {
-    printf("Stop Motor . Last Activation: %f. Last Pause: %f", timeSinceLastActivation, timeSinceLastPause);
+        printf("Stop Motor . Last Activation: %f. Last Pause: %f", timeSinceLastActivation, timeSinceLastPause);
         stopTheMotor();
     }
 }
@@ -520,12 +520,12 @@ void testApp::update()
 			calculateMovmementForShader();
 		}
 
-    //if (amountOfMovement > kAMOUNT_OF_MOVEMENT_THRESHOLD)
+if (amountOfMovement > kAMOUNT_OF_MOVEMENT_THRESHOLD)
     {
-        //startTheMotor();
+        startTheMotor();
 
     }
-    //scheduleMotorStop();
+    scheduleMotorStop();
 
 }
 
