@@ -3,7 +3,7 @@
 #include "ofMain.h"
 #include "OphiodeaConstants.h"
 
-//#define DEMO_MODE
+#define DEMO_MODE
 
 class testApp : public ofBaseApp{
 	public:
@@ -46,8 +46,14 @@ class testApp : public ofBaseApp{
 
         int imageWidthWithoutBlendingArea;
         int imageHeightWithoutBlendingArea;
-
-
+		
+		bool bUseShaderRender;
+		ofFbo fbo;
+		ofShader circleShader;
+		
+		bool bUseMask;
+		ofImage maskImg;
+		
 		// Our own functions
 
         void updateALLtheCaptures();
@@ -57,4 +63,7 @@ class testApp : public ofBaseApp{
         void applySphereTransformation();
         void calculateAmountOfMovement();
         double distanceBetweenTwoPoints(float x1, float y1, float z1, float x2, float y2, float z2);
+		
+		// shader render
+		void renderWithShader();
 };

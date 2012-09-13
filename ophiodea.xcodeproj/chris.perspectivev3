@@ -274,7 +274,7 @@
 							<key>PBXSmartGroupTreeModuleOutlineStateSelectionKey</key>
 							<array>
 								<array>
-									<integer>7</integer>
+									<integer>6</integer>
 									<integer>3</integer>
 									<integer>0</integer>
 								</array>
@@ -297,7 +297,7 @@
 							<real>185</real>
 						</array>
 						<key>RubberWindowFrame</key>
-						<string>130 57 1205 696 0 0 1280 778 </string>
+						<string>678 -89 1205 696 0 0 1280 778 </string>
 					</dict>
 					<key>Module</key>
 					<string>PBXSmartGroupTreeModule</string>
@@ -315,7 +315,7 @@
 								<key>PBXProjectModuleGUID</key>
 								<string>83D825C8159A37DF00E92C6D</string>
 								<key>PBXProjectModuleLabel</key>
-								<string>testApp.h</string>
+								<string>testApp.cpp</string>
 								<key>PBXSplitModuleInNavigatorKey</key>
 								<dict>
 									<key>Split0</key>
@@ -323,11 +323,11 @@
 										<key>PBXProjectModuleGUID</key>
 										<string>83D825C9159A37DF00E92C6D</string>
 										<key>PBXProjectModuleLabel</key>
-										<string>testApp.h</string>
+										<string>testApp.cpp</string>
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>83CB255A1600D118007D4B7A</string>
+										<string>83CB29B21601BABD007D4B7A</string>
 										<key>history</key>
 										<array>
 											<string>838F8D0715F917020044D114</string>
@@ -339,11 +339,10 @@
 											<string>839061DB15FE40D90057E8EC</string>
 											<string>8390621B15FE460D0057E8EC</string>
 											<string>83CB22431600828F007D4B7A</string>
-											<string>83CB23371600A71C007D4B7A</string>
 											<string>83CB24381600C654007D4B7A</string>
-											<string>83CB24B01600CA15007D4B7A</string>
-											<string>83CB25581600D118007D4B7A</string>
-											<string>83CB25591600D118007D4B7A</string>
+											<string>83CB29161600FDDA007D4B7A</string>
+											<string>83CB295316010210007D4B7A</string>
+											<string>83CB295416010210007D4B7A</string>
 										</array>
 									</dict>
 									<key>SplitCount</key>
@@ -359,7 +358,7 @@
 								<key>Frame</key>
 								<string>{{0, 0}, {998, 440}}</string>
 								<key>RubberWindowFrame</key>
-								<string>130 57 1205 696 0 0 1280 778 </string>
+								<string>678 -89 1205 696 0 0 1280 778 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXNavigatorGroup</string>
@@ -383,8 +382,6 @@
 									<dict>
 										<key>Frame</key>
 										<string>{{10, 27}, {998, 183}}</string>
-										<key>RubberWindowFrame</key>
-										<string>130 57 1205 696 0 0 1280 778 </string>
 									</dict>
 									<key>Module</key>
 									<string>XCDetailModule</string>
@@ -438,7 +435,9 @@
 									<key>GeometryConfiguration</key>
 									<dict>
 										<key>Frame</key>
-										<string>{{10, 27}, {998, 170}}</string>
+										<string>{{10, 27}, {998, 183}}</string>
+										<key>RubberWindowFrame</key>
+										<string>678 -89 1205 696 0 0 1280 778 </string>
 									</dict>
 									<key>Module</key>
 									<string>PBXBuildResultsModule</string>
@@ -665,7 +664,7 @@
 		<string>/Users/chris/Desktop/of_0071_osx_release/apps/ophiodea/Ophiodea-v2.0/ophiodea.xcodeproj</string>
 	</array>
 	<key>WindowString</key>
-	<string>130 57 1205 696 0 0 1280 778 </string>
+	<string>678 -89 1205 696 0 0 1280 778 </string>
 	<key>WindowToolsV3</key>
 	<array>
 		<dict>
