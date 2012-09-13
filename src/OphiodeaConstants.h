@@ -1,5 +1,5 @@
 // Capture configuration:
-#define kNUMBER_OF_CAMERAS 6
+#define kNUMBER_OF_CAMERAS 4
 #define kCAPTURED_IMAGE_WIDTH 320
 #define kCAPTURED_IMAGE_HEIGHT 240
 

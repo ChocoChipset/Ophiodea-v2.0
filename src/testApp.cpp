@@ -36,9 +36,9 @@ void testApp::makeLookUpTable()
 */
 void testApp::calculateAmountOfMovement()
 {
-    
+
 	int position;
-	
+
 	for (int j = 0; j < outputImageHeight; ++j) {
 
         for (int i = 0; i < outputImageWidth; ++i) {
@@ -47,7 +47,7 @@ void testApp::calculateAmountOfMovement()
                 pixelsForOutput[position] = pixelsForOutput[position] + (amountOfMovement *.01);
         }
     }
-	
+
 
 }
 
@@ -260,7 +260,7 @@ void testApp::updateALLtheCaptures()  // "X all the Y" pun intended
 	for( int i = 0; i < kNUMBER_OF_CAMERAS; ++i){
 		ofPixels mirrorPix = videoGrabber[0].getPixelsRef();
 		mirrorPix.mirror(1,0);
-		
+
 		if(i%2==0)
 			pixelsFromCamera[i].setFromPixels(mirrorPix.getPixels(), kCAPTURED_IMAGE_WIDTH, kCAPTURED_IMAGE_HEIGHT, kTHREE_CHANNELS); // Place capture in ofPixels object
 		else
@@ -270,47 +270,54 @@ void testApp::updateALLtheCaptures()  // "X all the Y" pun intended
 	for( int i = 0; i < kNUMBER_OF_CAMERAS; ++i)
     {
         videoGrabber[i].grabFrame();
-        pixelsFromCamera[i].setFromPixels(videoGrabber[i].getPixels(), kCAPTURED_IMAGE_WIDTH, kCAPTURED_IMAGE_HEIGHT, kTHREE_CHANNELS); // Place capture in ofPixels object
+
+       // if (videoGrabber[i].isFrameNew())
+        {
+            pixelsFromCamera[i].setFromPixels(videoGrabber[i].getPixels(), kCAPTURED_IMAGE_WIDTH, kCAPTURED_IMAGE_HEIGHT, kTHREE_CHANNELS); // Place capture in ofPixels object
+        }
+
+
+
     }
 #endif
-	
+
 }
 
 void testApp::renderWithShader(){
-	
+
 	ofImage outputImage;
 	outputImage.setFromPixels(pixelsForOutput);
-	
+
 	// render output image to fbo
 	fbo.begin();
 	ofClear(0);
 	outputImage.draw(0,0,outputImage.getWidth(),outputImage.getHeight());
 	fbo.end();
-	
-	
+
+/*
 	// render fbo with shader
 	circleShader.begin();
 		circleShader.setUniformTexture("src_tex",fbo.getTextureReference(),2);
 		circleShader.setUniform1f("halfOutputImageWidth",halfOutputImageWidth);
 		circleShader.setUniform1f("halfOutputImageHeight",halfOutputImageHeight);
-		
+*/
 		ofSetRectMode(OF_RECTMODE_CENTER);
 		fbo.draw(ofGetWidth()*.5, ofGetHeight()*.5,ofGetHeight(),ofGetHeight());
 		ofSetRectMode(OF_RECTMODE_CORNER);
-		
-	circleShader.end();
-	
+/*
+	circleShader.end();*/
+
 	// draw mask on top
 	ofSetRectMode(OF_RECTMODE_CENTER);
 	ofEnableAlphaBlending();
 	if(bUseMask) maskImg.draw(ofGetWidth()*.5, ofGetHeight()*.5);
 	ofDisableAlphaBlending();
 	ofSetRectMode(OF_RECTMODE_CORNER);
-	
-	
+
+
 	ofDrawBitmapString( ofToString(ofGetFrameRate()), 10,10);
 	ofDrawBitmapString( ofToString(amountOfMovement), 10,30);
-	
+
 }
 
 
@@ -319,8 +326,20 @@ void testApp::renderWithShader(){
 
 // OF Methods:
 //--------------------------------------------------------------
+
+void testApp::exit()
+{
+    for( int i = 0; i < kNUMBER_OF_CAMERAS; ++i)
+    {
+        videoGrabber[i].close();
+    }
+
+}
+
 void testApp::setup()
 {
+    //ofSetFrameRate(60);
+
     assert(kNUMBER_OF_CAMERAS % 2 == 0);    // We really need cameras in even numbers. Exit if not.
 
     amountOfMovement = 0;
@@ -367,11 +386,11 @@ void testApp::setup()
 
    	bUseMask = true;
 	maskImg.loadImage("mask.png");
-	
+
 	bUseShaderRender = true;
 	fbo.allocate(outputImageWidth,outputImageHeight,GL_RGB);
 	circleShader.load("circle.vert","circle.frag");
-	
+
 	ofBackground(0, 0, 0);  // Black Background
 
 
@@ -385,12 +404,12 @@ void testApp::update()
     placeCapturedImagesOnScreen();
     drawVerticalAlphaComposites();
     drawHorizontalAlphaComposites();
-    
+
 	if(!bUseShaderRender){
 		applySphereTransformation();
 		calculateAmountOfMovement();
 	}
-    
+
 }
 
 //--------------------------------------------------------------
@@ -398,31 +417,31 @@ void testApp::draw()
 {
     if(!bUseShaderRender)
 	{
-	
+
 		ofImage outputImage;
 		outputImage.setFromPixels(pixelsForOutput);
-		
-		
+
+
 		ofSetRectMode(OF_RECTMODE_CENTER);
-		
+
 		ofEnableAlphaBlending();
-		
+
 		outputImage.draw(ofGetWidth()*.5, ofGetHeight()*.5, ofGetHeight(),ofGetHeight());
-		
+
 		if(bUseMask) maskImg.draw(ofGetWidth()*.5, ofGetHeight()*.5);
 		ofDisableAlphaBlending();
-		
+
 		ofSetRectMode(OF_RECTMODE_CORNER);
-		
-		
+
+
 		ofDrawBitmapString( ofToString(ofGetFrameRate()), 10,10);
 		ofDrawBitmapString( ofToString(amountOfMovement), 10,30);
-	
+
 	}else{
 		renderWithShader();
 		//renderToSphere();
 	}
-	
+
 }
 
 double testApp::distanceBetweenTwoPoints(float x1, float y1, float z1, float x2, float y2, float z2)
