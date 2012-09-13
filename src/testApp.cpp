@@ -2,7 +2,7 @@
 #include <assert.h>
 #include <math.h>
 
-
+//int camindex[] = {1,2,4,5,0,3};
 // Our own functions
 //--------------------------------------------------------------
 /*
@@ -63,7 +63,7 @@ void testApp::calculateMovmementForShader()
 			grayPix = .333*rSource + .333*gSource + .333*bSource;
 			grayPPix = .333*rPrevious + .333*gPrevious + .333*bPrevious;
 			differenceInPixel = abs(grayPix - grayPPix);
-			if (differenceInPixel > kMOVEMENT_LOW_PASS_FILTER_CONSTANT*.5) amountOfMovement += differenceInPixel;
+			if (differenceInPixel > kMOVEMENT_LOW_PASS_FILTER_CONSTANT*.25) amountOfMovement += differenceInPixel;
 
 		}
 
@@ -72,6 +72,8 @@ void testApp::calculateMovmementForShader()
 
 	 for (int i = 0; i < outputImageWidth*outputImageHeight*3; i+=3)
 	 {
+
+        pixelsForOutput[i] = pixelsForOutput[i] + (amountOfMovement *.01);
 
 	 }
 
@@ -337,18 +339,18 @@ void testApp::renderWithShader(){
 	outputImage.draw(0,0,outputImage.getWidth(),outputImage.getHeight());
 	fbo.end();
 
-/*
+
 	// render fbo with shader
 	circleShader.begin();
 		circleShader.setUniformTexture("src_tex",fbo.getTextureReference(),2);
 		circleShader.setUniform1f("halfOutputImageWidth",halfOutputImageWidth);
 		circleShader.setUniform1f("halfOutputImageHeight",halfOutputImageHeight);
-*/
+
 		ofSetRectMode(OF_RECTMODE_CENTER);
 		fbo.draw(ofGetWidth()*.5, ofGetHeight()*.5,ofGetHeight(),ofGetHeight());
 		ofSetRectMode(OF_RECTMODE_CORNER);
-/*
-	circleShader.end();*/
+
+	circleShader.end();
 
 	// draw mask on top
 	ofSetRectMode(OF_RECTMODE_CENTER);
@@ -368,8 +370,9 @@ void testApp::startNextCamera(){
 
 	if(camsStarted < kNUMBER_OF_CAMERAS)
 	{
-		videoGrabber[camsStarted].setDeviceID(camsStarted);
+		videoGrabber[camsStarted].setDeviceID(kNUMBER_OF_CAMERAS);
 		videoGrabber[camsStarted].initGrabber(kCAPTURED_IMAGE_WIDTH, kCAPTURED_IMAGE_HEIGHT);
+        camsStarted++;
 	}
 
 }
@@ -394,7 +397,7 @@ void testApp::setup()
 
     assert(kNUMBER_OF_CAMERAS % 2 == 0);    // We really need cameras in even numbers. Exit if not.
 
-	camsStarted = 0;
+	camsStarted = kNUMBER_OF_CAMERAS;
     amountOfMovement = 0;
 
     halfTheNumberOfCameras = kNUMBER_OF_CAMERAS / 2;
@@ -408,12 +411,11 @@ void testApp::setup()
 #ifdef DEMO_MODE
 	videoGrabber[0].initGrabber(kCAPTURED_IMAGE_WIDTH, kCAPTURED_IMAGE_HEIGHT);
 #else
-	// Initialize Video Grabbers
-    //for(int i = 0; i < kNUMBER_OF_CAMERAS; ++i)
-    //{
-    //    videoGrabber[i].setDeviceID(i);
-    //    videoGrabber[i].initGrabber(kCAPTURED_IMAGE_WIDTH, kCAPTURED_IMAGE_HEIGHT);
-    //}
+	for(int i = 0; i < kNUMBER_OF_CAMERAS; ++i)
+    {
+        videoGrabber[i].setDeviceID( i );
+        videoGrabber[i].initGrabber(kCAPTURED_IMAGE_WIDTH, kCAPTURED_IMAGE_HEIGHT);
+    }
 #endif
 
     // Calculate Composite Image Output
@@ -452,8 +454,7 @@ void testApp::setup()
 //--------------------------------------------------------------
 void testApp::update()
 {
-    if(camsStarted == kNUMBER_OF_CAMERAS)
-	{
+
 
 		updateALLtheCaptures();
 
@@ -465,26 +466,16 @@ void testApp::update()
 			applySphereTransformation();
 			calculateAmountOfMovement();
 		}else{
-			//calculateMovmementForShader();
+			calculateMovmementForShader();
 		}
 
-	}else{
-		for(int i = 0; i < camsStarted; i++)
-		{
-			if(i > halfTheNumberOfCameras)
-			{
-				videoGrabber[i].draw(i*videoGrabber[i].getWidth(),videoGrabber[i].getHeight());
-			}else{
-				videoGrabber[i].draw(i*videoGrabber[i].getWidth(),0);
-			}
-		}
-	}
+
 }
 
 //--------------------------------------------------------------
 void testApp::draw()
 {
-    if(!bUseShaderRender)
+   if(!bUseShaderRender)
 	{
 
 		ofImage outputImage;
@@ -523,7 +514,7 @@ double testApp::distanceBetweenTwoPoints(float x1, float y1, float z1, float x2,
 void testApp::keyPressed(int key){
 	if(key == 's') bUseShaderRender = !bUseShaderRender;
 	else if(key == 'm') bUseMask = !bUseMask;
-	else if(key == ' ') startNextCamera();
+
 }
 
 //---------------------------------------------f-----------------
