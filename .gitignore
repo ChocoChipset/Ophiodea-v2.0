@@ -1,7 +1,8 @@
+.DS_Store
+build/
 obj/*
 bin/*
-.DS_Store
-
+!bin/data
 # Compiled Object files
 *.slo
 *.lo
