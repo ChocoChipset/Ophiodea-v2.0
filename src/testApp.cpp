@@ -395,10 +395,10 @@ void testApp::setup()
 {
     serialManager.listDevices();
 	vector <ofSerialDeviceInfo> deviceList = serialManager.getDeviceList();
-	serialManager.setup(0, 9600);
-    
-    serial.writeByte('X00');
-    
+	serialManager.setup("/dev/ttyACM0", 9600); //open the first device
+
+
+    //std::exit(1);
     //ofSetFrameRate(60);
 
     assert(kNUMBER_OF_CAMERAS % 2 == 0);    // We really need cameras in even numbers. Exit if not.
@@ -460,6 +460,9 @@ void testApp::setup()
 //--------------------------------------------------------------
 void testApp::update()
 {
+        serialManager.writeByte('X');
+        serialManager.writeByte('1');
+        serialManager.writeByte(0);
 
 
 		updateALLtheCaptures();

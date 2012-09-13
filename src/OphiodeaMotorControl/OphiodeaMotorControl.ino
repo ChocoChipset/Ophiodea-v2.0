@@ -21,10 +21,13 @@ unsigned char value         = 0;
 void parse_serial() {
 
  // send data only when you receive data:
- if (Serial.available() > 0) {
+ if (Serial.available()) {
    // read the incoming byte:
    incomingByte = Serial.read();
 
+   value = (unsigned char)incomingByte;   
+   
+  analogWrite(motorEnabledPin, value); 
    switch(syncState){
      case 0: // Header
        if(incomingByte == 'X') {
@@ -86,18 +89,16 @@ void setup() {
   pinMode(directionControlPinA2, OUTPUT);
   pinMode(motorEnabledPin, OUTPUT);
   
+  syncState = 0;
+  
   setDirection(kMOTOR_DIRECTION_CLOCKWISE);
-  Serial.begin(115200);
+  Serial.begin(9600);
   
   Serial.print("Motor Control running...");
 }
 
 void loop() 
 { 
-  
-  //unsigned char vel = analogRead(A0)/4;
-  //analogWrite(motorEnabledPin, vel); 
-  
-  parse_serial();
+  parseSerial();
 
 }
