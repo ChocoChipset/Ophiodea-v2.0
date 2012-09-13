@@ -390,6 +390,12 @@ void testApp::exit()
 
 void testApp::setup()
 {
+    serialManager.listDevices();
+	vector <ofSerialDeviceInfo> deviceList = serialManager.getDeviceList();
+	serialManager.setup(0, 9600);
+    
+    serial.writeByte('X00');
+    
     //ofSetFrameRate(60);
 
     assert(kNUMBER_OF_CAMERAS % 2 == 0);    // We really need cameras in even numbers. Exit if not.

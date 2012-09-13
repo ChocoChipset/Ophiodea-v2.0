@@ -34,6 +34,8 @@ class testApp : public ofBaseApp{
         ofPixels pixelsForBottomImage;
         ofPixels previosPixelsForOutput;
 
+    
+        ofSerial serialManager;
 
         int halfTheNumberOfCameras;
 
