@@ -34,7 +34,7 @@ class testApp : public ofBaseApp{
         ofPixels pixelsForBottomImage;
         ofPixels previosPixelsForOutput;
 
-    
+
         ofSerial serialManager;
 
         int halfTheNumberOfCameras;
@@ -47,6 +47,8 @@ class testApp : public ofBaseApp{
 
         double amountOfMovement;
 
+        int isMotorRunning;
+
         int imageWidthWithoutBlendingArea;
         int imageHeightWithoutBlendingArea;
 
@@ -57,6 +59,9 @@ class testApp : public ofBaseApp{
 		bool bUseMask;
 		ofImage maskImg;
 		int camsStarted;
+
+        time_t timeSinceLastActivation;
+        time_t timeSinceLastPause;
 
 		// Our own functions
 
@@ -71,6 +76,10 @@ class testApp : public ofBaseApp{
 		// shader render
 		void renderWithShader();
 		void calculateMovmementForShader();
+
+        void startTheMotor();
+        void stopTheMotor();
+        void scheduleMotorStop();
 
 		void startNextCamera();
 

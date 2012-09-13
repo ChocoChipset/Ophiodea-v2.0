@@ -1,6 +1,9 @@
 #include "testApp.h"
 #include <assert.h>
 #include <math.h>
+#include <time.h>
+
+
 
 //int camindex[] = {1,2,4,5,0,3};
 // Our own functions
@@ -328,6 +331,46 @@ void testApp::updateALLtheCaptures()  // "X all the Y" pun intended
 
 }
 
+void testApp::scheduleMotorStop()
+{
+    time_t now;
+
+    time(&now);
+
+    if (difftime(now, timeSinceLasqtActivation) > kMOTOR_ACTIVATION_INTERVAL && isMotorRunning)
+    {
+    printf("Stop Motor . Last Activation: %f. Last Pause: %f", timeSinceLastActivation, timeSinceLastPause);
+        stopTheMotor();
+    }
+}
+
+void testApp::stopTheMotor()
+{
+    serialManager.writeByte('X');
+    serialManager.writeByte(1);
+    serialManager.writeByte(0);
+    time(&timeSinceLastPause);
+    isMotorRunning = false;
+}
+
+
+void testApp::startTheMotor()       // Release the Kraken!!!
+{
+    time_t now;
+    time(&now);
+
+    if (difftime(now, timeSinceLastPause) > kMOTOR_ACTIVATION_PAUSE_INTERVAL && !isMotorRunning)
+    {
+        serialManager.writeByte('X');
+        serialManager.writeByte(1);
+        serialManager.writeByte(255);
+        time(&timeSinceLastActivation);
+        printf("StartMotor . Last Activation: %f. Last Pause: %f", timeSinceLastActivation, timeSinceLastPause);
+        isMotorRunning = true;
+    }
+
+}
+
 void testApp::renderWithShader(){
 
 	ofImage outputImage;
@@ -396,8 +439,8 @@ void testApp::setup()
     serialManager.listDevices();
 	vector <ofSerialDeviceInfo> deviceList = serialManager.getDeviceList();
 	serialManager.setup("/dev/ttyACM0", 9600); //open the first device
-
-
+    time(&timeSinceLastPause);
+    timeSinceLastPause = timeSinceLastPause - kMOTOR_ACTIVATION_PAUSE_INTERVAL;
     //std::exit(1);
     //ofSetFrameRate(60);
 
@@ -455,14 +498,13 @@ void testApp::setup()
 	ofBackground(0, 0, 0);  // Black Background
 
 
+
 }
 
 //--------------------------------------------------------------
 void testApp::update()
 {
-        serialManager.writeByte('X');
-        serialManager.writeByte('1');
-        serialManager.writeByte(0);
+
 
 
 		updateALLtheCaptures();
@@ -478,6 +520,12 @@ void testApp::update()
 			calculateMovmementForShader();
 		}
 
+    //if (amountOfMovement > kAMOUNT_OF_MOVEMENT_THRESHOLD)
+    {
+        //startTheMotor();
+
+    }
+    //scheduleMotorStop();
 
 }
 
@@ -523,6 +571,14 @@ double testApp::distanceBetweenTwoPoints(float x1, float y1, float z1, float x2,
 void testApp::keyPressed(int key){
 	if(key == 's') bUseShaderRender = !bUseShaderRender;
 	else if(key == 'm') bUseMask = !bUseMask;
+
+	else if (key == 'q') {
+            startTheMotor();
+	}
+	else if (key == 'w') {
+            scheduleMotorStop();
+	}
+
 
 }
 
