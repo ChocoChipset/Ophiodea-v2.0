@@ -49,6 +49,30 @@ void testApp::calculateMovmementForShader()
 	float grayPPix;
 	amountOfMovement = 0;
 
+#ifdef USE_OPENCV
+	colorImgLarge.setFromPixels(pixelsForOutput.getPixels(), pixelsForOutput.getWidth(),pixelsForOutput.getHeight());
+	colorImg.scaleIntoMe(colorImgLarge);
+	grayImage.setFromColorImage(colorImg);
+	
+	colorImgLarge.setFromPixels(previosPixelsForOutput.getPixels(), previosPixelsForOutput.getWidth(),previosPixelsForOutput.getHeight());
+	colorImg.scaleIntoMe(colorImgLarge);
+	grayBg.setFromColorImage(colorImg);
+	
+	grayDiff.absDiff(grayBg, grayImage);
+	grayDiff.threshold(60);
+	
+	amountOfMovement = grayDiff.countNonZeroInRegion(0, 0, grayDiff.getWidth(), grayDiff.getHeight());
+	
+	previosPixelsForOutput.setFromPixels(pixelsForOutput.getPixels(), outputImageWidth, outputImageHeight, kTHREE_CHANNELS);
+	
+	float val = ofMap(amountOfMovement, 0, 3000, 0, 255, true);;
+	amountMoveBlend = .9 * amountMoveBlend + .1 * val;
+	
+	for (int i = 0; i < outputImageWidth*outputImageHeight*3; i+=3)
+	{
+        pixelsForOutput[i] = pixelsForOutput[i] + amountMoveBlend;//MIN(255,pixelsForOutput[i] + amountMoveBlend);//(amountOfMovement *.01);
+	}
+#else
 
 
         for (int i = 0; i < outputImageWidth*outputImageHeight*3; i+=6) {
@@ -79,6 +103,7 @@ void testApp::calculateMovmementForShader()
         pixelsForOutput[i] = pixelsForOutput[i] + (amountOfMovement *.01);
 
 	 }
+#endif
 
 }
 
@@ -420,6 +445,60 @@ void testApp::startNextCamera(){
 
 }
 
+void testApp::generateMaskImage()
+{
+	int radius = (ofGetHeight() * .5) - 10;
+	float blendArea = 50;
+	ofImage maskImage;
+	maskImage.allocate(ofGetWidth(),ofGetHeight(),OF_IMAGE_COLOR_ALPHA);
+	
+	float centerX = ofGetWidth()*.5;
+	float centerY = ofGetHeight()*.5;
+	
+	int w = ofGetWidth();
+	
+	for(int x = 0; x < ofGetWidth(); x++)
+	{
+		for( int y = 0; y < ofGetHeight(); y++)
+		{
+			int p = 4*(y * w + x);
+			float pdist = sqrt( (x-centerX)*(x-centerX)+(y-centerY)*(y-centerY) );
+			unsigned char * pixels = maskImage.getPixels();
+			//floa pdist = int(dist);
+			
+			if( pdist >= radius )
+			{
+					pixels[p] = 0;
+					pixels[p+1] = 0;
+					pixels[p+2] = 0;
+					pixels[p+3] = 255;
+			}
+			else if(pdist > (radius-blendArea) )
+			{
+				float val = 1-((radius-pdist)/blendArea);
+				val = powf(val,1.99);
+				
+				pixels[p] = 0;
+				pixels[p+1] = 0;
+				pixels[p+2] = 0;
+				pixels[p+3] = (255*val);
+			}
+			else{
+				pixels[p] = 0;
+				pixels[p+1] = 0;
+				pixels[p+2] = 0;
+				pixels[p+3] = 0;
+			}
+			
+			
+		}
+		
+	}
+	
+	maskImage.saveImage("maskGen.png", OF_IMAGE_QUALITY_HIGH);
+	maskImg.loadImage("maskGen.png");
+}
+
 //--------------------------------------------------------------
 
 // OF Methods:
@@ -436,6 +515,9 @@ void testApp::exit()
 
 void testApp::setup()
 {
+	
+	generateMaskImage();
+	
     serialManager.listDevices();
 	vector <ofSerialDeviceInfo> deviceList = serialManager.getDeviceList();
 	serialManager.setup("/dev/ttyACM0", 9600); //open the first device
@@ -489,11 +571,21 @@ void testApp::setup()
     halfOutputImageWidth = outputImageWidth / 2;
 
    	bUseMask = true;
-	maskImg.loadImage("mask.png");
+	//maskImg.loadImage("mask.png");
 
 	bUseShaderRender = true;
 	fbo.allocate(outputImageWidth,outputImageHeight,GL_RGB);
 	circleShader.load("circle.vert","circle.frag");
+	
+	
+	#ifdef USE_OPENCV
+	colorImgLarge.allocate(outputImageWidth,outputImageHeight);
+	colorImg.allocate(320,240);
+	grayImage.allocate(320,240);
+	grayBg.allocate(320,240);
+	grayDiff.allocate(320,240);
+	amountMoveBlend = 0;
+	#endif
 
 	ofBackground(0, 0, 0);  // Black Background
 

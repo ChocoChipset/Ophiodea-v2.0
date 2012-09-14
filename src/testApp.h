@@ -4,6 +4,12 @@
 #include "OphiodeaConstants.h"
 
 //#define DEMO_MODE
+//#define USE_OPENCV
+
+// we can remove #ifdefs after opencv added to linux version
+#ifdef USE_OPENCV
+#include "ofxOpenCv.h"
+#endif
 
 class testApp : public ofBaseApp{
 	public:
@@ -62,6 +68,15 @@ class testApp : public ofBaseApp{
 
         time_t timeSinceLastActivation;
         time_t timeSinceLastPause;
+		
+		#ifdef USE_OPENCV
+			ofxCvColorImage			colorImgLarge;
+			ofxCvColorImage			colorImg;
+			ofxCvGrayscaleImage 	grayImage;
+			ofxCvGrayscaleImage 	grayBg;
+			ofxCvGrayscaleImage 	grayDiff;
+			float amountMoveBlend;
+		#endif
 
 		// Our own functions
 
@@ -81,6 +96,8 @@ class testApp : public ofBaseApp{
         void stopTheMotor();
         void scheduleMotorStop();
 
-		void startNextCamera();
+		void startNextCamera(); // remove?
+		
+		void generateMaskImage();
 
 };
