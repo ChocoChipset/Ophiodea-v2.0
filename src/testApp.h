@@ -3,8 +3,8 @@
 #include "ofMain.h"
 #include "OphiodeaConstants.h"
 
-//#define DEMO_MODE
-//#define USE_OPENCV
+#define DEMO_MODE
+#define USE_OPENCV
 
 // we can remove #ifdefs after opencv added to linux version
 #ifdef USE_OPENCV
@@ -77,7 +77,9 @@ class testApp : public ofBaseApp{
 			ofxCvGrayscaleImage 	grayDiff;
 			float amountMoveBlend;
 		#endif
-
+		
+		bool bShowControls;
+		
 		// Our own functions
 
         void updateALLtheCaptures();

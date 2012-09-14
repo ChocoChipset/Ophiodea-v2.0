@@ -3,42 +3,6 @@
 #include <math.h>
 #include <time.h>
 
-
-
-//int camindex[] = {1,2,4,5,0,3};
-// Our own functions
-//--------------------------------------------------------------
-/*
-void testApp::makeLookUpTable()
-{
-	float x,y;
-	float xt,yt;
-	int it,jt;
-
-	int h = imgout.getHeight();
-	int w = imgout.getWidth();
-
-	for (int j=0;j<h;j++) {
-		for (int i=0;i<w;i++) {
-
-			x = (i-ic)/rw;
-			y = (j-jc)/rh;
-
-			xt = x*sqrt(1-0.5*y*y);
-			yt = y*sqrt(1-0.5*x*x);
-
-			it = int(rw*xt + ic);
-			jt = int(rh*yt + jc);
-
-			//c = imgout.pixels[i+j*imgout.width];//get(i,j);
-			//imgcircle.pixels[it+jt*imgcircle.width] = c;//set(it,jt,c);
-			lookUpCircleX[i][j] = it;
-			lookUpCircleY[i][j] = jt;
-		}
-
-	}
-*/
-
 void testApp::calculateMovmementForShader()
 {
 	int position;
@@ -428,8 +392,8 @@ void testApp::renderWithShader(){
 	ofSetRectMode(OF_RECTMODE_CORNER);
 
 
-	ofDrawBitmapString( ofToString(ofGetFrameRate()), 10,10);
-	ofDrawBitmapString( ofToString(amountOfMovement), 10,30);
+	//ofDrawBitmapString( ofToString(ofGetFrameRate()), 10,10);
+	//ofDrawBitmapString( ofToString(amountOfMovement), 10,30);
 
 }
 
@@ -516,15 +480,19 @@ void testApp::exit()
 void testApp::setup()
 {
 	
-	generateMaskImage();
+	string filePath = "maskGen.png";
+	ofFile file(filePath);
+	if(!file.exists()){
+		generateMaskImage();
+	}else
+		maskImg.loadImage("maskGen.png");
+	
 	
     serialManager.listDevices();
 	vector <ofSerialDeviceInfo> deviceList = serialManager.getDeviceList();
 	serialManager.setup("/dev/ttyACM0", 9600); //open the first device
     time(&timeSinceLastPause);
     timeSinceLastPause = timeSinceLastPause - kMOTOR_ACTIVATION_PAUSE_INTERVAL;
-    //std::exit(1);
-    //ofSetFrameRate(60);
 
     assert(kNUMBER_OF_CAMERAS % 2 == 0);    // We really need cameras in even numbers. Exit if not.
 
@@ -540,6 +508,7 @@ void testApp::setup()
     }
 
 #ifdef DEMO_MODE
+	videoGrabber[0].setPixelFormat(OF_PIXELS_RGB);
 	videoGrabber[0].initGrabber(kCAPTURED_IMAGE_WIDTH, kCAPTURED_IMAGE_HEIGHT);
 #else
 	for(int i = 0; i < kNUMBER_OF_CAMERAS; ++i)
@@ -587,6 +556,8 @@ void testApp::setup()
 	amountMoveBlend = 0;
 	#endif
 
+	bShowControls = true;
+	
 	ofBackground(0, 0, 0);  // Black Background
 
 
@@ -642,12 +613,17 @@ void testApp::draw()
 
 		ofSetRectMode(OF_RECTMODE_CORNER);
 
-
-		ofDrawBitmapString( ofToString(ofGetFrameRate()), 10,10);
-		ofDrawBitmapString( ofToString(amountOfMovement), 10,30);
-
 	}else{
 		renderWithShader();
+		
+	}
+	
+	if(bShowControls)
+	{
+		ofDrawBitmapString( ofToString(ofGetFrameRate()), 10,10);
+		ofDrawBitmapString( ofToString(amountOfMovement), 10,30);
+		ofDrawBitmapString( "SPACE: hide controls\nm: toggle mask\nf: toggle fullscreen\ni: generate new mask\ns: toggle shader render", 10,60);
+
 	}
 
 }
@@ -670,8 +646,13 @@ void testApp::keyPressed(int key){
 	else if (key == 'w') {
             scheduleMotorStop();
 	}
-
-
+	else if(key == 'i') generateMaskImage();
+	else if(key == 'f') ofToggleFullscreen();
+	else if(key == ' ') {
+		bShowControls = !bShowControls;
+		if(bShowControls) ofShowCursor();
+		else ofHideCursor();
+	}
 }
 
 //---------------------------------------------f-----------------
